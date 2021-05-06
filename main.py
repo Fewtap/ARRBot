@@ -21,6 +21,8 @@ now = datetime.now() # current date and time
 emojiClass = 'reactionInner-15NvIl'
 messageClass = 'container-1ov-mD'
 
+print("MACKES ÄLSKLINGS BOT, SUG KUK GOOGE")
+
 print("Input credentials for Discord... \n")
 
 username = input("Email: ")
