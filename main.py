@@ -1,10 +1,13 @@
 import time
 from datetime import datetime
 import random
-
+import winsound
 import selenium.common.exceptions
 from selenium import webdriver
-
+from selenium.webdriver.common.action_chains import ActionChains
+import platform
+import os
+import logging
 
 
 def SetTimer(seconds):
@@ -15,20 +18,27 @@ def SetTimer(seconds):
         seconds = seconds - 1
         time.sleep(1)
 
+import logging
+logging.basicConfig(filename=f'logs', encoding='utf-8', level=logging.DEBUG)
 
 now = datetime.now() # current date and time
 
 emojiClass = 'reactionInner-15NvIl'
-messageClass = 'container-1ov-mD'
+messageClass = 'message-2qnXI6 cozyMessage-3V1Y8y groupStart-23k01U wrapper-2a6GCs cozy-3raOZG zalgo-jN1Ica'
 
 print("MACKES ÄLSKLINGS BOT, SUG KUK GOOGE")
 
 print("Input credentials for Discord... \n")
 
-username = input("Email: ")
-password = input("Password: ")
+username = "banansplit21@hotmail.com" #input("Email: ")
+password = "Liquid12" #input("Password: ")
 
-driver = webdriver.Chrome(executable_path="chromedriver.exe")
+if str(platform.system()) == 'Windows':
+    driver = webdriver.Chrome(executable_path="chromedriver.exe")
+elif str(platform.system()) == 'Linux':
+    driver = webdriver.Firefox()
+
+
 
 
 
@@ -72,27 +82,93 @@ def NewMessageFoundAction():
     print(f'{time.ctime()}: New message found!')
 
     try:
-        allemojis = driver.find_elements_by_class_name('reactionInner-15NvIl')
-        lastreaction = allemojis[len(allemojis) - 1]
-        time.sleep(random.randint(3, 7))
-        lastreaction.click()
+        print(f"Message ID: {LastMessageID}")
+        reactionMessageID = driver.find_element_by_css_selector(f'#{LastMessageID} + div').get_property('id')
+        print(f'Reaction ID: {reactionMessageID}')
+        reaction = driver.find_element_by_xpath(f'//div[@id="{reactionMessageID}"]/div[2]/div[2]/div[1]/div')
+    except selenium.common.exceptions.NoSuchElementException:
+        print("Emoji not found")
+
+    print(nameoftheuser)
+    x = random.randint(3, 7)
+    SetTimer(x)
+    try:
+        ClickOnEmoji(reaction)
+        winsound.PlaySound('SystemAsterisk', winsound.SND_ASYNC)
         print("Reacted.")
-    except:
-        print("No reaction found.")
-        pass
+        logging.info(f"Reaction occurred at: {now.strftime()} \n Emoji Message ID: {reactionMessageID}")
+    except Exception as e:
+        print(e)
+
+def ClickOnEmoji(emoji):
+    hover = ActionChains(driver).move_to_element(emoji).perform()
+    time.sleep(1)
+    emoji.click()
+
+
+def GetMessages():
+
+    return driver.find_elements_by_xpath("//div[@class='message-2qnXI6 cozyMessage-3V1Y8y groupStart-23k01U wrapper-2a6GCs cozy-3raOZG zalgo-jN1Ica']")
+
+def FilterMessages(AllMessages):
+
+        finishedList = []
+
+
+        for x in AllMessages:
+            try:
+                id = x.get_property('id')
+                #print(id)
+                nameofuser = driver.find_element_by_xpath(f"//div[@id='{id}']/div[1]/h2/span[1]/span").text
+                #print(nameofuser)
+
+                if nameofuser == "ARRR TipBot":
+
+                    finishedList.append(x)
+
+
+            except selenium.common.exceptions.NoSuchElementException:
+                print("Name not found.")
+                pass
+            except:
+                print("Other error.")
+
+
+        return finishedList
+
+
+
 
 
 while True:
-    originalMessageSize = len(driver.find_elements_by_xpath("//span[text()='ARRR TipBot']"))
 
-    while originalMessageSize == len(driver.find_elements_by_xpath("//span[text()='ARRR TipBot']")):
+    Messages = FilterMessages(GetMessages())
+    print(len(Messages))
+    originalMessageSize = len(Messages)
+    MessageFound = False
+
+    try:
+        LastMessageID = Messages[len(Messages) - 1].get_property("id")
+        MessageFound = True
+    except:
+        print("No message ID")
+        MessageFound = False
+
+
+
+    while originalMessageSize == len(FilterMessages(GetMessages())):
 
         time.sleep(1)
         CurrentTime = now.strftime("%H:%M:%S")
         print(f'{time.ctime()}: No new message')
 
-    originalMessageSize = len(driver.find_elements_by_xpath("//span[text()='ARRR TipBot']"))
+    Messages = FilterMessages(GetMessages())
+    originalMessageSize = len(FilterMessages(GetMessages()))
 
+    LastMessageID = Messages[len(Messages) - 1].get_property("id")
+    nameoftheuser = driver.find_element_by_xpath(f"//div[@id='{LastMessageID}']/div[1]/h2/span[1]/span").text
+
+    SetTimer(5)
 
 
     NewMessageFoundAction()
