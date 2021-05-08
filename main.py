@@ -30,8 +30,8 @@ print("MACKES ÄLSKLINGS BOT, SUG KUK GOOGE")
 
 print("Input credentials for Discord... \n")
 
-username = "banansplit21@hotmail.com" #input("Email: ")
-password = "Liquid12" #input("Password: ")
+username = input("Email: ")
+password = input("Password: ")
 
 if str(platform.system()) == 'Windows':
     driver = webdriver.Chrome(executable_path="chromedriver.exe")
